@@ -6,6 +6,7 @@ const app = express();
 const connectDB = require("./db/connect");
 // Authentication middleware
 const authenticateUser = require("./middleware/authentication");
+const cors = require("cors");
 
 //routers
 const authRouter = require("./routes/auth");
@@ -20,6 +21,7 @@ const tasksRouter = require("./routes/tasks");
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
+app.use(cors());
 app.use(express.static("./public"));
 app.use(express.json());
 

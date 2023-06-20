@@ -128,7 +128,10 @@ const getCustomer = asyncWrapper(async (req, res) => {
   }
 
   await Customer.findOne(query).exec(async function (err, customer) {
-    if (err) return NotFoundError(err);
+    if (err) {
+      const error = new NotFoundError(err);
+      return res.status(404).json(new NotFoundError(err));
+    }
     if (!customer) {
       return res
         .status(404)
