@@ -128,14 +128,12 @@ const getCustomer = asyncWrapper(async (req, res) => {
   }
 
   await Customer.findOne(query).exec(async function (err, customer) {
-    if (err) {
-      const error = new NotFoundError(err);
-      return res.status(404).json(new NotFoundError(err));
-    }
+    if (err)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
     if (!customer) {
       return res
         .status(404)
-        .json({ msg: `No customer with id : ${customerId}` });
+        .json({ msg: `No Hay Cliente con el ID : ${customerId}` });
     }
     res.status(StatusCodes.OK).json(customer);
   });
@@ -155,7 +153,8 @@ const createCustomer = asyncWrapper(async (req, res) => {
   Customer.findOne({ _id: customerId })
     .populate("createdBy")
     .exec(async function (err, customer) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       customer.createdBy.customers.push(customerId);
       await customer.createdBy.save();
     });
@@ -173,7 +172,7 @@ const updateCustomer = asyncWrapper(async (req, res) => {
   if (!customer) {
     return next(
       createCustomError(
-        `No customer with id : ${customerId}`,
+        `No Hay Cliente con el ID : ${customerId}`,
         StatusCodes.NOT_FOUND
       )
     );
@@ -199,11 +198,12 @@ const deleteCustomer = asyncWrapper(async (req, res) => {
   await Customer.findOne({ _id: customerId })
     .populate("tasks")
     .exec(async function (err, customer) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!customer) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No customer with id : ${customerId}` });
+          .json({ msg: `No Hay Cliente con el ID : ${customerId}` });
       }
 
       for (let i = 0; i < customer.tasks.length; i++) {

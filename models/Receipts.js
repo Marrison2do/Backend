@@ -5,12 +5,12 @@ const ReceiptSchema = new mongoose.Schema(
     company: {
       type: mongoose.Types.ObjectId,
       ref: "Company",
-      required: [true, "Please provide company"],
+      required: [true, "Ingrese Empresa"],
     },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      required: [true, "Please provide user"],
+      required: [true, "Ingrese Usuario"],
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
@@ -18,16 +18,16 @@ const ReceiptSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: [true, "Please provide price"],
+      required: [true, "Ingrese Precio"],
     },
     currency: {
       type: String,
       enum: ["UYU", "USD"],
-      required: [true, "Please provide currency"],
+      required: [true, "Ingrese Moneda"],
     },
     legalDate: {
       type: Date,
-      required: [true, "Please provide date"],
+      required: [true, "Ingrese Fecha de Emisión"],
     },
     invoices: [
       {
@@ -38,16 +38,16 @@ const ReceiptSchema = new mongoose.Schema(
     invoicesPrices: [
       {
         type: Number,
-        required: [true, "Please provide price of the invoices"],
+        required: [true, "Ingrese Precio de las Facturas"],
       },
     ],
     set: {
       type: String,
-      required: [true, "Please provide set"],
+      required: [true, "Ingrese Serie del recibo"],
     },
     number: {
       type: Number,
-      required: [true, "Please provide number"],
+      required: [true, "Ingrese Número de Recibo"],
     },
   },
   { timestamps: true }

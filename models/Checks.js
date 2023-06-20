@@ -8,17 +8,17 @@ const CheckSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: [true, "Please provide price"],
+      required: [true, "Ingrese Precio"],
     },
     customer: {
       type: mongoose.Types.ObjectId,
       ref: "Customer",
-      required: [true, "Please provide customer"],
+      required: [true, "Ingrese Cliente"],
     },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      required: [true, "Please provide user"],
+      required: [true, "Ingrese Usuario"],
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
@@ -27,28 +27,28 @@ const CheckSchema = new mongoose.Schema(
     currency: {
       type: String,
       enum: ["UYU", "USD"],
-      required: [true, "Please provide currency"],
+      required: [true, "Ingrese Moneda"],
     },
     task: {
       type: mongoose.Types.ObjectId,
       ref: "Task",
-      required: [true, "Please provide task"],
+      required: [true, "Ingrese Tarea"],
     },
     bank: {
       type: String,
-      required: [true, "Please provide bank"],
+      required: [true, "Ingrese Banco"],
     },
     set: {
       type: String,
-      required: [true, "Please provide set"],
+      required: [true, "Ingrese Serie de Cheque"],
     },
     number: {
       type: Number,
-      required: [true, "Please provide number"],
+      required: [true, "Ingrese Numero de Cheque"],
     },
     paymentDate: {
       type: Date,
-      required: [true, "Please rovide payment date"],
+      required: [true, "Ingrese Fecha de Cobro del Cheque"],
     },
     adminRank: {
       type: Boolean,

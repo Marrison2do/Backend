@@ -114,7 +114,8 @@ const getCompany = asyncWrapper(async (req, res) => {
   const { id: companyId } = req.params;
   const query = { _id: companyId };
   await Company.findOne(query).exec(async function (err, company) {
-    if (err) return NotFoundError(err);
+    if (err)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
     if (!company) {
       return res
         .status(StatusCodes.NOT_FOUND)
@@ -131,14 +132,16 @@ const createCompany = asyncWrapper(async (req, res) => {
   Company.findOne({ _id: companyId })
     .populate("createdBy")
     .exec(async function (err, company) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       company.createdBy.companies.push(companyId);
       await company.createdBy.save();
     });
   Company.findOne({ _id: companyId })
     .populate("customer")
     .exec(async function (err, company) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       company.customer.company = companyId;
       await company.customer.save();
     });
@@ -160,7 +163,8 @@ const deleteCompany = asyncWrapper(async (req, res) => {
   await Company.findOne({ _id: companyId })
     .populate("invoices")
     .exec(async function (err, company) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!company) {
         return res
           .status(StatusCodes.NOT_FOUND)

@@ -137,11 +137,12 @@ const getCheck = asyncWrapper(async (req, res) => {
     var query = { _id: checkId };
   }
   await Check.findOne(query).exec(async function (err, check) {
-    if (err) return NotFoundError(err);
+    if (err)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
     if (!check) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No check with id : ${checkId}` });
+        .json({ msg: `No Hay Cheque con el ID : ${checkId}` });
     }
     res.status(StatusCodes.OK).json(check);
   });
@@ -161,7 +162,8 @@ const createCheck = asyncWrapper(async (req, res) => {
   Task.findOne({ _id: taskId })
     .populate("customer")
     .exec(async function (err, task) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       task.customer.tasks.push(taskId);
       if (type == "payment") {
         taskPrice = -1 * taskPrice;
@@ -179,7 +181,8 @@ const createCheck = asyncWrapper(async (req, res) => {
   Task.findOne({ _id: taskId })
     .populate("createdBy")
     .exec(async function (err, task) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       task.createdBy.tasks.push(taskId);
       task.createdBy.checks.push(checkId);
       await task.createdBy.save();
@@ -198,11 +201,12 @@ const updateCheck = asyncWrapper(async (req, res) => {
   await Task.findOne({ _id: taskId })
     .populate("customer")
     .exec(async function (err, task) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!task) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No task with id : ${taskId}` });
+          .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
       }
       if (type == "payment") {
         taskPrice = -1 * taskPrice;
@@ -234,7 +238,8 @@ const updateCheck = asyncWrapper(async (req, res) => {
   Task.findOne({ _id: taskId })
     .populate("customer")
     .exec(async function (err, task) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (newType == "payment") {
         newTaskPrice = -1 * newTaskPrice;
       }
@@ -259,11 +264,12 @@ const deleteCheck = asyncWrapper(async (req, res) => {
   await Task.findOne({ _id: taskId })
     .populate("customer")
     .exec(async function (err, task) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!task) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No task with id : ${taskId}` });
+          .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
       }
       let taskPrice = await task.price;
       const taskCurrency = await task.currency;
@@ -287,7 +293,10 @@ const deleteCheck = asyncWrapper(async (req, res) => {
       Task.findOneAndDelete({ _id: taskId })
         .populate("createdBy")
         .exec(async function (err, task) {
-          if (err) return new NotFoundError(err);
+          if (err)
+            return res
+              .status(StatusCodes.NOT_FOUND)
+              .json({ msg: `ID Inválida` });
           const userTaskIndex = task.createdBy.tasks.indexOf(task._id);
           task.createdBy.tasks.splice(userTaskIndex, 1);
           const userCheckIndex = task.createdBy.checks.indexOf(task.check);
@@ -296,7 +305,7 @@ const deleteCheck = asyncWrapper(async (req, res) => {
         });
       await Check.findOneAndDelete({ _id: checkId });
 
-      await res.status(StatusCodes.OK).send("Check deleted");
+      await res.status(StatusCodes.OK).send("Cheque Eliminado Correctamente");
     });
 });
 

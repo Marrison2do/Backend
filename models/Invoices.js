@@ -8,17 +8,17 @@ const InvoiceSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required: [true, "Please provide price"],
+      required: [true, "Ingrese Precio"],
     },
     company: {
       type: mongoose.Types.ObjectId,
       ref: "Company",
-      required: [true, "Please provide company"],
+      required: [true, "Ingrese Empresa"],
     },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
-      required: [true, "Please provide user"],
+      required: [true, "Ingrese Usuario"],
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
@@ -28,20 +28,20 @@ const InvoiceSchema = new mongoose.Schema(
     currency: {
       type: String,
       enum: ["UYU", "USD"],
-      required: [true, "Please provide currency"],
+      required: [true, "Ingrese Moneda"],
     },
     legalDate: {
       type: Date,
-      required: [true, "Please provide date"],
+      required: [true, "Ingrese Fecha de Emisión"],
     },
     serial: {
       type: Number,
-      required: [true, "Please provide serial"],
+      required: [true, "Ingrese Número de Factura"],
     },
     invoiceType: {
       type: String,
       enum: ["e-invoice", "creditMemo", "e-ticket"],
-      required: [true, "Please provide invoice type"],
+      required: [true, "Ingrese invoice type"],
     },
     payed: {
       type: Boolean,

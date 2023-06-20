@@ -116,11 +116,12 @@ const getInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
   const query = { _id: invoiceId };
   await Invoice.findOne(query).exec(async function (err, invoice) {
-    if (err) return NotFoundError(err);
+    if (err)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
     if (!invoice) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No invoice with id : ${invoiceId}` });
+        .json({ msg: `No Hay Factura con el ID : ${invoiceId}` });
     }
     res.status(StatusCodes.OK).json(invoice);
   });
@@ -136,14 +137,16 @@ const createInvoice = asyncWrapper(async (req, res) => {
   Invoice.findOne({ _id: invoiceId })
     .populate("createdBy")
     .exec(async function (err, invoice) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       invoice.createdBy.invoices.push(invoiceId);
       await invoice.createdBy.save();
     });
   Invoice.findOne({ _id: invoiceId })
     .populate("company")
     .exec(async function (err, invoice) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       invoice.company.invoices.push(invoiceId);
       if (type == "creditMemo") {
         invoicePrice = -1 * invoicePrice;
@@ -169,11 +172,12 @@ const updateInvoice = asyncWrapper(async (req, res) => {
   await Invoice.findOne({ _id: invoiceId })
     .populate("company")
     .exec(async function (err, invoice) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!invoice) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No invoice with id : ${invoiceId}` });
+          .json({ msg: `No Hay Factura con el ID : ${invoiceId}` });
       }
 
       if (type == "creditMemo") {
@@ -202,7 +206,8 @@ const updateInvoice = asyncWrapper(async (req, res) => {
   Invoice.findOne({ _id: invoiceId })
     .populate("company")
     .exec(async function (err, invoice) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (newType == "creditMemo") {
         newInvoicePrice = -1 * newInvoicePrice;
       }
@@ -226,11 +231,12 @@ const deleteInvoice = asyncWrapper(async (req, res) => {
   await Invoice.findOne({ _id: invoiceId })
     .populate("company")
     .exec(async function (err, invoice) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!invoice) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No invoice with id : ${invoiceId}` });
+          .json({ msg: `No Hay Factura con el ID : ${invoiceId}` });
       }
       let invoicePrice = await invoice.price;
       const invoiceCurrency = await invoice.currency;
@@ -251,7 +257,10 @@ const deleteInvoice = asyncWrapper(async (req, res) => {
       Invoice.findOneAndDelete({ _id: invoiceId })
         .populate("createdBy")
         .exec(async function (err, invoice) {
-          if (err) return new NotFoundError(err);
+          if (err)
+            return res
+              .status(StatusCodes.NOT_FOUND)
+              .json({ msg: `ID Inválida` });
           const userIndex = invoice.createdBy.invoices.indexOf(invoice._id);
           invoice.createdBy.invoices.splice(userIndex, 1);
           await invoice.createdBy.save();

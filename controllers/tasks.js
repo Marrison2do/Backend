@@ -132,7 +132,7 @@ const getTask = asyncWrapper(async (req, res) => {
     if (!task) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No task with id : ${taskId}` });
+        .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
     }
     res.status(StatusCodes.OK).json(task);
   });
@@ -185,7 +185,7 @@ const updateTask = asyncWrapper(async (req, res) => {
       if (!task) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No task with id : ${taskId}` });
+          .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
       }
       console.log("old");
       console.log(task);
@@ -245,7 +245,7 @@ const deleteTask = asyncWrapper(async (req, res) => {
       if (!task) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No task with id : ${taskId}` });
+          .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
       }
       let taskPrice = await task.price;
       const taskCurrency = await task.currency;

@@ -106,11 +106,12 @@ const getReceipt = asyncWrapper(async (req, res) => {
   const { id: receiptId } = req.params;
   const query = { _id: receiptId };
   await Receipt.findOne(query).exec(async function (err, receipt) {
-    if (err) return NotFoundError(err);
+    if (err)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
     if (!receipt) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No receipt with id : ${receiptId}` });
+        .json({ msg: `No Hay Recibo con el ID : ${receiptId}` });
     }
     res.status(StatusCodes.OK).json(receipt);
   });
@@ -125,7 +126,8 @@ const createReceipt = asyncWrapper(async (req, res) => {
   Receipt.findOne({ _id: receiptId })
     .populate("invoices")
     .exec(async function (err, receipt) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       for (i = 0; i < receipt.invoices.length; i++) {
         receipt.invoices[i].receipt = receiptId;
         receipt.invoices[i].payed = true;
@@ -135,14 +137,16 @@ const createReceipt = asyncWrapper(async (req, res) => {
   Receipt.findOne({ _id: receiptId })
     .populate("createdBy")
     .exec(async function (err, receipt) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       receipt.createdBy.receipts.push(receiptId);
       await receipt.createdBy.save();
     });
   Receipt.findOne({ _id: receiptId })
     .populate("company")
     .exec(async function (err, receipt) {
-      if (err) return NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       receipt.company.receipts.push(receiptId);
       if (receiptCurrency == "UYU") {
         receipt.company.debtUyu = receipt.company.debtUyu - receiptPrice;
@@ -164,11 +168,12 @@ const updateReceipt = asyncWrapper(async (req, res) => {
   await Receipt.findOne({ _id: receiptId })
     .populate("company")
     .exec(async function (err, receipt) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!receipt) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No receipt with id : ${receiptId}` });
+          .json({ msg: `No Hay Recibo con el ID : ${receiptId}` });
       }
 
       if (receiptPrice) {
@@ -193,7 +198,8 @@ const updateReceipt = asyncWrapper(async (req, res) => {
   Receipt.findOne({ _id: receiptId })
     .populate("company")
     .exec(async function (err, receipt) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (newReceiptPrice) {
         if (newReceiptCurrency == "UYU") {
           receipt.company.debtUyu = receipt.company.debtUyu - newReceiptPrice;
@@ -212,11 +218,12 @@ const deleteReceipt = asyncWrapper(async (req, res) => {
   await Receipt.findOne({ _id: receiptId })
     .populate("company")
     .exec(async function (err, receipt) {
-      if (err) return new NotFoundError(err);
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!receipt) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No receipt with id : ${receiptId}` });
+          .json({ msg: `No Hay Recibo con el ID : ${receiptId}` });
       }
       let receiptPrice = await receipt.price;
       const receiptCurrency = await receipt.currency;
@@ -237,7 +244,10 @@ const deleteReceipt = asyncWrapper(async (req, res) => {
       Receipt.findOneAndDelete({ _id: receiptId })
         .populate("createdBy")
         .exec(async function (err, receipt) {
-          if (err) return new NotFoundError(err);
+          if (err)
+            return res
+              .status(StatusCodes.NOT_FOUND)
+              .json({ msg: `ID Inválida` });
           const userIndex = receipt.createdBy.receipts.indexOf(receipt._id);
           receipt.createdBy.receipts.splice(userIndex, 1);
           await receipt.createdBy.save();

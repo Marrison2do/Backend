@@ -17,18 +17,18 @@ const login = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    throw new BadRequestError("please provide username and password");
+    throw new BadRequestError("Ingrese Usuario y Contraseña");
   }
   const user = await User.findOne({ username });
 
   if (!user) {
-    throw new UnauthenticatedError("Invalid Credentials");
+    throw new UnauthenticatedError("Usuario y/o Contraseña Incorrectos");
   }
 
   // compare password
   const isPasswordCorrect = await user.comparePassword(password);
   if (!isPasswordCorrect) {
-    throw new UnauthenticatedError("incorrect password");
+    throw new UnauthenticatedError("Usuario y/o Contraseña Incorrectos");
   }
 
   const token = user.createJWT();
