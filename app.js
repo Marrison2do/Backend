@@ -25,12 +25,12 @@ app.use(express.json());
 
 // routes
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/checks", checksRouter);
-app.use("/api/v1/companies", companiesRouter);
-app.use("/api/v1/customers", customersRouter);
-app.use("/api/v1/invoices", invoicesRouter);
-app.use("/api/v1/receipts", receiptsRouter);
-app.use("/api/v1/tasks", tasksRouter);
+app.use("/api/v1/checks", authenticateUser, checksRouter);
+app.use("/api/v1/companies", authenticateUser, companiesRouter);
+app.use("/api/v1/customers", authenticateUser, customersRouter);
+app.use("/api/v1/invoices", authenticateUser, invoicesRouter);
+app.use("/api/v1/receipts", authenticateUser, receiptsRouter);
+app.use("/api/v1/tasks", authenticateUser, tasksRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
