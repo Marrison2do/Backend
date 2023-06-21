@@ -25,7 +25,7 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     queryObject.adminRank = false;
   }
   if (name) {
-    queryObject.description = { $regex: name, $options: "i" };
+    queryObject.name = { $regex: name, $options: "i" };
   }
   if (description) {
     queryObject.description = { $regex: description, $options: "i" };
@@ -68,10 +68,10 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     };
   }
   if (newerUpdateThan && !olderUpdateThan) {
-    queryObject.createdAt = { $gte: new Date(newerUpdateThan) };
+    queryObject.updatedAt = { $gte: new Date(newerUpdateThan) };
   }
   if (!newerUpdateThan && olderUpdateThan) {
-    queryObject.createdAt = { $lte: new Date(olderUpdateThan) };
+    queryObject.updatedAt = { $lte: new Date(olderUpdateThan) };
   }
 
   if (numericFilters) {
@@ -101,6 +101,7 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     debtUsd: 1,
     company: 1,
     createdAt: 1,
+    updatedAt: 1,
     phoneNumber: 1,
     description: 1,
     archive: 1,
