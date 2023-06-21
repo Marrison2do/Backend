@@ -57,10 +57,10 @@ const getAllCompanies = asyncWrapper(async (req, res) => {
     };
   }
   if (newerUpdateThan && !olderUpdateThan) {
-    queryObject.createdAt = { $gte: new Date(newerUpdateThan) };
+    queryObject.updatedAt = { $gte: new Date(newerUpdateThan) };
   }
   if (!newerUpdateThan && olderUpdateThan) {
-    queryObject.createdAt = { $lte: new Date(olderUpdateThan) };
+    queryObject.updatedAt = { $lte: new Date(olderUpdateThan) };
   }
 
   if (numericFilters) {
@@ -119,7 +119,7 @@ const getCompany = asyncWrapper(async (req, res) => {
     if (!company) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No company with id : ${companyId}` });
+        .json({ msg: `No Hay Empresa con el ID : ${companyId}` });
     }
     res.status(StatusCodes.OK).json(company);
   });
@@ -168,7 +168,7 @@ const deleteCompany = asyncWrapper(async (req, res) => {
       if (!company) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No company with id : ${companyId}` });
+          .json({ msg: `No Hay Empresa con el ID : ${companyId}` });
       }
 
       for (let i = 0; i < company.invoices.length; i++) {

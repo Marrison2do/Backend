@@ -62,7 +62,7 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     queryObject.createdAt = { $lte: new Date(olderThan) };
   }
   if (newerUpdateThan && olderUpdateThan) {
-    queryObject.createdAt = {
+    queryObject.updatedAt = {
       $gte: new Date(newerUpdateThan),
       $lte: new Date(olderUpdateThan),
     };
