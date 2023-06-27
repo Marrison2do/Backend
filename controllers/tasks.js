@@ -104,6 +104,7 @@ const getAllTasks = asyncWrapper(async (req, res) => {
     createdAt: 1,
     type: 1,
     archive: 1,
+    currency: 1,
   };
 
   let result = Task.find(queryObject, projection).populate("customer", "name");
