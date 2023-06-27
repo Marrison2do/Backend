@@ -116,7 +116,7 @@ const getAllChecks = asyncWrapper(async (req, res) => {
     task: 1,
   };
 
-  let result = Check.find(queryObject, projection);
+  let result = Check.find(queryObject, projection).populate("customer", "name");
   if (sort) {
     const sortList = sort.split(",").join(" ");
     result = result.sort(sortList);
@@ -136,16 +136,20 @@ const getCheck = asyncWrapper(async (req, res) => {
   } else {
     var query = { _id: checkId };
   }
-  await Check.findOne(query).exec(async function (err, check) {
-    if (err)
-      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-    if (!check) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No Hay Cheque con el ID : ${checkId}` });
-    }
-    res.status(StatusCodes.OK).json(check);
-  });
+  await Check.findOne(query)
+    .populate("customer", "name")
+    .populate("createdBy", "name")
+    .populate("updatedBy", "name")
+    .exec(async function (err, check) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      if (!check) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ msg: `No Hay Cheque con el ID : ${checkId}` });
+      }
+      res.status(StatusCodes.OK).json(check);
+    });
 });
 
 const createCheck = asyncWrapper(async (req, res) => {

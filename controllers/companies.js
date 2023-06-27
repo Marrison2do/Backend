@@ -98,7 +98,10 @@ const getAllCompanies = asyncWrapper(async (req, res) => {
     receipts: 1,
   };
 
-  let result = Company.find(queryObject, projection);
+  let result = Company.find(queryObject, projection).populate(
+    "customer",
+    "name"
+  );
   if (sort) {
     const sortList = sort.split(",").join(" ");
     result = result.sort(sortList);
@@ -113,16 +116,20 @@ const getAllCompanies = asyncWrapper(async (req, res) => {
 const getCompany = asyncWrapper(async (req, res) => {
   const { id: companyId } = req.params;
   const query = { _id: companyId };
-  await Company.findOne(query).exec(async function (err, company) {
-    if (err)
-      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-    if (!company) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No Hay Empresa con el ID : ${companyId}` });
-    }
-    res.status(StatusCodes.OK).json(company);
-  });
+  await Company.findOne(query)
+    .populate("customer", "name")
+    .populate("createdBy", "name")
+    .populate("updatedBy", "name")
+    .exec(async function (err, company) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      if (!company) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ msg: `No Hay Empresa con el ID : ${companyId}` });
+      }
+      res.status(StatusCodes.OK).json(company);
+    });
 });
 
 const createCompany = asyncWrapper(async (req, res) => {

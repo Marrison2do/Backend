@@ -90,7 +90,9 @@ const getAllReceipts = asyncWrapper(async (req, res) => {
     number: 1,
   };
 
-  let result = Receipt.find(queryObject, projection);
+  let result = Receipt.find(queryObject, projection)
+    .populate("company", "name")
+    .populate("invoices");
   if (sort) {
     const sortList = sort.split(",").join(" ");
     result = result.sort(sortList);
@@ -105,16 +107,20 @@ const getAllReceipts = asyncWrapper(async (req, res) => {
 const getReceipt = asyncWrapper(async (req, res) => {
   const { id: receiptId } = req.params;
   const query = { _id: receiptId };
-  await Receipt.findOne(query).exec(async function (err, receipt) {
-    if (err)
-      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-    if (!receipt) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No Hay Recibo con el ID : ${receiptId}` });
-    }
-    res.status(StatusCodes.OK).json(receipt);
-  });
+  await Receipt.findOne(query)
+    .populate("company", "name")
+    .populate("createdBy", "name")
+    .populate("updatedBy", "name")
+    .exec(async function (err, receipt) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      if (!receipt) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ msg: `No Hay Recibo con el ID : ${receiptId}` });
+      }
+      res.status(StatusCodes.OK).json(receipt);
+    });
 });
 
 const createReceipt = asyncWrapper(async (req, res) => {

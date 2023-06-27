@@ -128,16 +128,20 @@ const getCustomer = asyncWrapper(async (req, res) => {
     var query = { _id: customerId };
   }
 
-  await Customer.findOne(query).exec(async function (err, customer) {
-    if (err)
-      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-    if (!customer) {
-      return res
-        .status(404)
-        .json({ msg: `No Hay Cliente con el ID : ${customerId}` });
-    }
-    res.status(StatusCodes.OK).json(customer);
-  });
+  await Customer.findOne(query)
+    .populate("company", "name")
+    .populate("createdBy", "name")
+    .populate("updatedBy", "name")
+    .exec(async function (err, customer) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      if (!customer) {
+        return res
+          .status(404)
+          .json({ msg: `No Hay Cliente con el ID : ${customerId}` });
+      }
+      res.status(StatusCodes.OK).json(customer);
+    });
 });
 
 const createCustomer = asyncWrapper(async (req, res) => {

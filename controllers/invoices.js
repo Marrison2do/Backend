@@ -100,7 +100,10 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
     payed: 1,
   };
 
-  let result = Invoice.find(queryObject, projection);
+  let result = Invoice.find(queryObject, projection).populate(
+    "company",
+    "name"
+  );
   if (sort) {
     const sortList = sort.split(",").join(" ");
     result = result.sort(sortList);
@@ -115,16 +118,20 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
 const getInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
   const query = { _id: invoiceId };
-  await Invoice.findOne(query).exec(async function (err, invoice) {
-    if (err)
-      return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-    if (!invoice) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No Hay Factura con el ID : ${invoiceId}` });
-    }
-    res.status(StatusCodes.OK).json(invoice);
-  });
+  await Invoice.findOne(query)
+    .populate("company", "name")
+    .populate("createdBy", "name")
+    .populate("updatedBy", "name")
+    .exec(async function (err, invoice) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      if (!invoice) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ msg: `No Hay Factura con el ID : ${invoiceId}` });
+      }
+      res.status(StatusCodes.OK).json(invoice);
+    });
 });
 
 const createInvoice = asyncWrapper(async (req, res) => {

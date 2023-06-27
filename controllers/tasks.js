@@ -106,7 +106,7 @@ const getAllTasks = asyncWrapper(async (req, res) => {
     archive: 1,
   };
 
-  let result = Task.find(queryObject, projection);
+  let result = Task.find(queryObject, projection).populate("customer", "name");
   if (sort) {
     const sortList = sort.split(",").join(" ");
     result = result.sort(sortList);
@@ -127,15 +127,19 @@ const getTask = asyncWrapper(async (req, res) => {
     var query = { _id: taskId };
   }
 
-  await Task.findOne(query).exec(async function (err, task) {
-    if (err) return new NotFoundError(err);
-    if (!task) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
-    }
-    res.status(StatusCodes.OK).json(task);
-  });
+  await Task.findOne(query)
+    .populate("customer", "name")
+    .populate("createdBy", "name")
+    .populate("updatedBy", "name")
+    .exec(async function (err, task) {
+      if (err) return new NotFoundError(err);
+      if (!task) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
+      }
+      res.status(StatusCodes.OK).json(task);
+    });
 });
 
 const createTask = asyncWrapper(async (req, res) => {
