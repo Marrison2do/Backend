@@ -18,6 +18,7 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     newerUpdateThan,
     olderUpdateThan,
     numericFilters,
+    phoneNumber,
   } = req.query;
   const queryObject = {};
   const rank = req.user.rank;
@@ -48,6 +49,9 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
       name: { $regex: createdBy, $options: "i" },
     });
     queryObject.createdBy = idUser;
+  }
+  if (phoneNumber) {
+    queryObject.phoneNumber = { $regex: phoneNumber, $options: "i" };
   }
   if (newerThan && olderThan) {
     queryObject.createdAt = {
