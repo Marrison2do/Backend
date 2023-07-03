@@ -98,6 +98,7 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
     invoiceType: 1,
     serial: 1,
     payed: 1,
+    createdAt: 1,
   };
 
   let result = Invoice.find(queryObject, projection).populate(
