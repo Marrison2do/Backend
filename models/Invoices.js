@@ -40,7 +40,7 @@ const InvoiceSchema = new mongoose.Schema(
     },
     invoiceType: {
       type: String,
-      enum: ["e-invoice", "creditMemo", "e-ticket"],
+      enum: ["e-invoice", "creditMemo"],
       required: [true, "Ingrese invoice type"],
     },
     payed: {
