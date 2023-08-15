@@ -43,7 +43,6 @@ const ReceiptSchema = new mongoose.Schema(
     ],
     set: {
       type: String,
-      required: [true, "Ingrese Serie del recibo"],
     },
     number: {
       type: Number,

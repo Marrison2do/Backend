@@ -15,7 +15,7 @@ const getAllChecks = asyncWrapper(async (req, res) => {
     newerThan,
     olderThan,
     payBefore,
-    PayAfter,
+    payAfter,
     updatedBy,
     set,
     currency,
@@ -69,16 +69,16 @@ const getAllChecks = asyncWrapper(async (req, res) => {
   if (!newerThan && olderThan) {
     queryObject.legalDate = { $lte: new Date(olderThan) };
   }
-  if (PayAfter && payBefore) {
+  if (payAfter && payBefore) {
     queryObject.paymentDate = {
-      $gte: new Date(PayAfter),
+      $gte: new Date(payAfter),
       $lte: new Date(payBefore),
     };
   }
-  if (PayAfter && !payBefore) {
-    queryObject.paymentDate = { $gte: new Date(PayAfter) };
+  if (payAfter && !payBefore) {
+    queryObject.paymentDate = { $gte: new Date(payAfter) };
   }
-  if (!PayAfter && payBefore) {
+  if (!payAfter && payBefore) {
     queryObject.paymentDate = { $lte: new Date(payBefore) };
   }
 
@@ -114,6 +114,7 @@ const getAllChecks = asyncWrapper(async (req, res) => {
     paymentDate: 1,
     number: 1,
     task: 1,
+    createdAt: 1,
   };
 
   let result = Check.find(queryObject, projection).populate("customer", "name");

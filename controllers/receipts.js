@@ -169,27 +169,18 @@ const updateReceipt = asyncWrapper(async (req, res) => {
 
   const { id: receiptId } = req.params;
   const oldReceipt = await Receipt.findOne({ _id: receiptId });
-  var receiptPrice = await oldReceipt.price;
-  const receiptCurrency = await oldReceipt.currency;
-  await Receipt.findOne({ _id: receiptId })
+  Receipt.findOne({ _id: receiptId })
+    .populate("invoices")
     .populate("company")
     .exec(async function (err, receipt) {
       if (err)
         return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-      if (!receipt) {
-        return res
-          .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No Hay Recibo con el ID : ${receiptId}` });
-      }
 
-      if (receiptPrice) {
-        if (receiptCurrency == "UYU") {
-          receipt.company.debtUyu = receipt.company.debtUyu + receiptPrice;
-        } else {
-          receipt.company.debtUsd = receipt.company.debtUsd + receiptPrice;
-        }
+      for (i = 0; i < receipt.invoices.length; i++) {
+        receipt.invoices[i].receipt = null;
+        receipt.invoices[i].payed = false;
+        await receipt.invoices[i].save();
       }
-      await receipt.company.save();
     });
 
   req.body.updatedBy = req.user.userId;
@@ -198,20 +189,32 @@ const updateReceipt = asyncWrapper(async (req, res) => {
     runValidators: true,
   });
   const newReceipt = await Receipt.findOne({ _id: receiptId });
-  let newReceiptPrice = await newReceipt.price;
-  console.log(newReceiptPrice);
-  const newReceiptCurrency = await newReceipt.currency;
+  Receipt.findOne({ _id: receiptId })
+    .populate("invoices")
+    .populate("company")
+    .exec(async function (err, receipt) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      for (i = 0; i < receipt.invoices.length; i++) {
+        receipt.invoices[i].receipt = receiptId;
+        receipt.invoices[i].payed = true;
+        await receipt.invoices[i].save();
+      }
+    });
+
+  await Receipt.findOne({ _id: receiptId });
   Receipt.findOne({ _id: receiptId })
     .populate("company")
     .exec(async function (err, receipt) {
       if (err)
         return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-      if (newReceiptPrice) {
-        if (newReceiptCurrency == "UYU") {
-          receipt.company.debtUyu = receipt.company.debtUyu - newReceiptPrice;
-        } else {
-          receipt.company.debtUsd = receipt.company.debtUsd - newReceiptPrice;
-        }
+
+      if (oldReceipt.currency == "UYU") {
+        receipt.company.debtUyu =
+          receipt.company.debtUyu + oldReceipt.price - newReceipt.price;
+      } else {
+        receipt.company.debtUsd =
+          receipt.company.debtUsd + oldReceipt.price - newReceipt.price;
       }
       await receipt.company.save();
     });

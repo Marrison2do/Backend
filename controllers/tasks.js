@@ -29,9 +29,6 @@ const getAllTasks = asyncWrapper(async (req, res) => {
   if (description) {
     queryObject.description = { $regex: description, $options: "i" };
   }
-  if (archive) {
-    queryObject.archive = archive;
-  }
 
   if (currency) {
     queryObject.currency = currency;
@@ -50,6 +47,24 @@ const getAllTasks = asyncWrapper(async (req, res) => {
       name: { $regex: customer, $options: "i" },
     });
     queryObject.customer = idCustomer._id;
+  }
+  if (!archive && !customer) {
+    const customerList = await Customer.find({
+      archive: false,
+    });
+    const idMap = customerList.map((customer) => {
+      return customer._id;
+    });
+    queryObject.customer = idMap;
+  }
+  if (archive && !customer) {
+    const customerList = await Customer.find({
+      archive: true,
+    });
+    const idMap = customerList.map((customer) => {
+      return customer._id;
+    });
+    queryObject.customer = idMap;
   }
   if (createdBy) {
     const idUser = await User.find({

@@ -186,18 +186,6 @@ const updateCustomer = asyncWrapper(async (req, res) => {
       )
     );
   }
-  const isArchived = await customer.archive;
-
-  for (let i = 0; i < customer.tasks.length; i++) {
-    await Task.findOneAndUpdate(
-      { _id: customer.tasks[i] },
-      { archive: isArchived },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-  }
 
   res.status(StatusCodes.OK).json(customer);
 });

@@ -40,10 +40,6 @@ const TaskSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    archive: {
-      type: Boolean,
-      default: false,
-    },
   },
   { timestamps: true }
 );
