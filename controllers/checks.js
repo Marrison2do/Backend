@@ -198,7 +198,7 @@ const createCheck = asyncWrapper(async (req, res) => {
 
 const updateCheck = asyncWrapper(async (req, res) => {
   const { id: checkId } = req.params;
-  const { id: taskId } = req.body.taskId;
+  const { _id: taskId } = req.body.task;
   const oldTask = await Task.findOne({ _id: taskId });
   var taskPrice = await oldTask.price;
   const taskCurrency = await oldTask.currency;

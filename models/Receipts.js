@@ -38,7 +38,6 @@ const ReceiptSchema = new mongoose.Schema(
     invoicesPrices: [
       {
         type: Number,
-        required: [true, "Ingrese Precio de las Facturas"],
       },
     ],
     set: {
