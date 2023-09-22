@@ -23,9 +23,29 @@ const getAllTasks = asyncWrapper(async (req, res) => {
   } = req.query;
   const queryObject = {};
   const rank = req.user.rank;
-  if (rank !== "admin") {
-    queryObject.adminRank = false;
+
+  {
+    const customerObject = {};
+    if (rank !== "admin") {
+      customerObject.adminRank = false;
+    }
+    if (customer) {
+      customerObject.name = { $regex: customer, $options: "i" };
+    }
+    if (!archive) {
+      customerObject.archive = false;
+    }
+    if (archive) {
+      customerObject.archive = true;
+    }
+
+    const customerList = await Customer.find(customerObject);
+    const idMap = customerList.map((customer) => {
+      return customer._id;
+    });
+    queryObject.customer = idMap;
   }
+
   if (description) {
     queryObject.description = { $regex: description, $options: "i" };
   }
@@ -41,30 +61,6 @@ const getAllTasks = asyncWrapper(async (req, res) => {
   }
   if (noPrice) {
     queryObject.price = undefined;
-  }
-  if (customer) {
-    const idCustomer = await Customer.findOne({
-      name: { $regex: customer, $options: "i" },
-    });
-    queryObject.customer = idCustomer._id;
-  }
-  if (!archive && !customer) {
-    const customerList = await Customer.find({
-      archive: false,
-    });
-    const idMap = customerList.map((customer) => {
-      return customer._id;
-    });
-    queryObject.customer = idMap;
-  }
-  if (archive && !customer) {
-    const customerList = await Customer.find({
-      archive: true,
-    });
-    const idMap = customerList.map((customer) => {
-      return customer._id;
-    });
-    queryObject.customer = idMap;
   }
   if (createdBy) {
     const idUser = await User.find({
@@ -207,8 +203,6 @@ const updateTask = asyncWrapper(async (req, res) => {
           .status(StatusCodes.NOT_FOUND)
           .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
       }
-      console.log("old");
-      console.log(task);
 
       if (type == "payment") {
         taskPrice = -1 * taskPrice;
@@ -216,10 +210,8 @@ const updateTask = asyncWrapper(async (req, res) => {
       if (taskPrice) {
         if (taskCurrency == "UYU") {
           task.customer.debtUyu = task.customer.debtUyu - taskPrice;
-          console.log("old UYU");
         } else {
           task.customer.debtUsd = task.customer.debtUsd - taskPrice;
-          console.log("old USD");
         }
       }
       await task.customer.save();
@@ -244,10 +236,8 @@ const updateTask = asyncWrapper(async (req, res) => {
       if (newTaskPrice) {
         if (newTaskCurrency == "UYU") {
           task.customer.debtUyu = task.customer.debtUyu + newTaskPrice;
-          console.log("new UYU");
         } else {
           task.customer.debtUsd = task.customer.debtUsd + newTaskPrice;
-          console.log("new USD");
         }
       }
       await task.customer.save();

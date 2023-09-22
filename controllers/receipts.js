@@ -137,6 +137,7 @@ const createReceipt = asyncWrapper(async (req, res) => {
       for (i = 0; i < receipt.invoices.length; i++) {
         receipt.invoices[i].receipt = receiptId;
         receipt.invoices[i].payed = true;
+        receipt.invoices[i].updatedBy = req.user.userId;
         await receipt.invoices[i].save();
       }
     });

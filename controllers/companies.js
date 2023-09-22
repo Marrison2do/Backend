@@ -150,6 +150,7 @@ const createCompany = asyncWrapper(async (req, res) => {
       if (err)
         return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       company.customer.company = companyId;
+      company.customer.adminRank = false;
       await company.customer.save();
     });
   res.status(StatusCodes.CREATED).json({ company });

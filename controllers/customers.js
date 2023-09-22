@@ -141,7 +141,7 @@ const getCustomer = asyncWrapper(async (req, res) => {
         return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
       if (!customer) {
         return res
-          .status(404)
+          .status(StatusCodes.NOT_FOUND)
           .json({ msg: `No Hay Cliente con el ID : ${customerId}` });
       }
       res.status(StatusCodes.OK).json(customer);
@@ -150,6 +150,8 @@ const getCustomer = asyncWrapper(async (req, res) => {
 
 const createCustomer = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
+  const rank = req.user.rank;
+  if (rank == "admin") req.body.adminRank = true;
   const customer = await Customer.create({
     name: req.body.name,
     phoneNumber: req.body.phoneNumber,
@@ -179,12 +181,9 @@ const updateCustomer = asyncWrapper(async (req, res) => {
   });
   const customer = await Customer.findOne({ _id: customerId });
   if (!customer) {
-    return next(
-      createCustomError(
-        `No Hay Cliente con el ID : ${customerId}`,
-        StatusCodes.NOT_FOUND
-      )
-    );
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .json({ msg: `No Hay Cliente con el ID : ${customerId}` });
   }
 
   res.status(StatusCodes.OK).json(customer);
