@@ -88,6 +88,7 @@ const getAllReceipts = asyncWrapper(async (req, res) => {
     invoicesPrices: 1,
     set: 1,
     number: 1,
+    color: 1,
   };
 
   let result = Receipt.find(queryObject, projection)

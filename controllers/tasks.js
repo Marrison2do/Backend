@@ -13,6 +13,7 @@ const getAllTasks = asyncWrapper(async (req, res) => {
     sort,
     createdBy,
     archive,
+    pack,
     updatedBy,
     newerThan,
     olderThan,
@@ -44,6 +45,9 @@ const getAllTasks = asyncWrapper(async (req, res) => {
       return customer._id;
     });
     queryObject.customer = idMap;
+  }
+  if (pack) {
+    queryObject.pack = { $regex: pack, $options: "i" };
   }
 
   if (description) {
@@ -110,12 +114,15 @@ const getAllTasks = asyncWrapper(async (req, res) => {
   }
   const projection = {
     description: 1,
+    comment: 1,
+    pack: 1,
     price: 1,
     customer: 1,
     createdAt: 1,
     type: 1,
     archive: 1,
     currency: 1,
+    color: 1,
   };
 
   let result = Task.find(queryObject, projection).populate("customer", "name");
@@ -123,7 +130,7 @@ const getAllTasks = asyncWrapper(async (req, res) => {
     const sortList = sort.split(",").join(" ");
     result = result.sort(sortList);
   } else {
-    result = result.sort("createdAt");
+    result = result.sort("pack");
   }
 
   const list = await result;
@@ -231,7 +238,7 @@ const updateTask = asyncWrapper(async (req, res) => {
     .exec(async function (err, task) {
       if (err) return new NotFoundError(err);
       if (newType == "payment") {
-        taskPrice = -1 * taskPrice;
+        newTaskPrice = -1 * newTaskPrice;
       }
       if (newTaskPrice) {
         if (newTaskCurrency == "UYU") {

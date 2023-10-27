@@ -114,6 +114,7 @@ const getAllChecks = asyncWrapper(async (req, res) => {
     paymentDate: 1,
     number: 1,
     task: 1,
+    color: 1,
     createdAt: 1,
   };
 
@@ -197,70 +198,80 @@ const createCheck = asyncWrapper(async (req, res) => {
 });
 
 const updateCheck = asyncWrapper(async (req, res) => {
-  const { id: checkId } = req.params;
-  const { _id: taskId } = req.body.task;
-  const oldTask = await Task.findOne({ _id: taskId });
-  var taskPrice = await oldTask.price;
-  const taskCurrency = await oldTask.currency;
-  const type = await oldTask.type;
-  await Task.findOne({ _id: taskId })
-    .populate("customer")
-    .exec(async function (err, task) {
-      if (err)
-        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-      if (!task) {
-        return res
-          .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
-      }
-      if (type == "payment") {
-        taskPrice = -1 * taskPrice;
-      }
-      if (taskPrice) {
-        if (taskCurrency == "UYU") {
-          task.customer.debtUyu = task.customer.debtUyu - taskPrice;
-        } else {
-          task.customer.debtUsd = task.customer.debtUsd - taskPrice;
-        }
-      }
-      await task.customer.save();
+  if (!req.body.task) {
+    console.log("a");
+    const { id: checkId } = req.params;
+    const check = await Check.findOneAndUpdate({ _id: checkId }, req.body, {
+      new: true,
+      runValidators: true,
     });
-  req.body.task.updatedBy = req.user.userId;
-  req.body.check.updatedBy = req.user.userId;
-  await Task.findOneAndUpdate({ _id: taskId }, req.body.task, {
-    new: true,
-    runValidators: true,
-  });
-  await Check.findOneAndUpdate({ _id: checkId }, req.body.check, {
-    new: true,
-    runValidators: true,
-  });
-  const check = await Check.findOne({ _id: checkId });
-  const newTask = await Task.findOne({ _id: taskId });
-  let newTaskPrice = await newTask.price;
-  const newTaskCurrency = await newTask.currency;
-  const newType = await newTask.type;
-  Task.findOne({ _id: taskId })
-    .populate("customer")
-    .exec(async function (err, task) {
-      if (err)
-        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-      if (newType == "payment") {
-        newTaskPrice = -1 * newTaskPrice;
-      }
-      if (newTaskPrice) {
-        if (newTaskCurrency == "UYU") {
-          task.customer.debtUyu = task.customer.debtUyu + newTaskPrice;
-          console.log("work UYU");
-        } else {
-          task.customer.debtUsd = task.customer.debtUsd + newTaskPrice;
-          console.log("work USD");
+    console.log(check);
+    res.status(StatusCodes.OK).json({ check });
+  }
+  if (req.body.task) {
+    const { id: checkId } = req.params;
+    const { _id: taskId } = req.body.task;
+    const oldTask = await Task.findOne({ _id: taskId });
+    var taskPrice = await oldTask.price;
+    const taskCurrency = await oldTask.currency;
+    const type = await oldTask.type;
+    await Task.findOne({ _id: taskId })
+      .populate("customer")
+      .exec(async function (err, task) {
+        if (err)
+          return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+        if (!task) {
+          return res
+            .status(StatusCodes.NOT_FOUND)
+            .json({ msg: `No Hay Tareas con el ID : ${taskId}` });
         }
-      }
-      await task.customer.save();
+        if (type == "payment") {
+          taskPrice = -1 * taskPrice;
+        }
+        if (taskPrice) {
+          if (taskCurrency == "UYU") {
+            task.customer.debtUyu = task.customer.debtUyu - taskPrice;
+          } else {
+            task.customer.debtUsd = task.customer.debtUsd - taskPrice;
+          }
+        }
+        await task.customer.save();
+      });
+    req.body.task.updatedBy = req.user.userId;
+    req.body.check.updatedBy = req.user.userId;
+    await Task.findOneAndUpdate({ _id: taskId }, req.body.task, {
+      new: true,
+      runValidators: true,
     });
+    await Check.findOneAndUpdate({ _id: checkId }, req.body.check, {
+      new: true,
+      runValidators: true,
+    });
+    const check = await Check.findOne({ _id: checkId });
+    const newTask = await Task.findOne({ _id: taskId });
+    let newTaskPrice = await newTask.price;
+    const newTaskCurrency = await newTask.currency;
+    const newType = await newTask.type;
+    Task.findOne({ _id: taskId })
+      .populate("customer")
+      .exec(async function (err, task) {
+        if (err)
+          return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+        if (newType == "payment") {
+          newTaskPrice = -1 * newTaskPrice;
+        }
+        if (newTaskPrice) {
+          if (newTaskCurrency == "UYU") {
+            task.customer.debtUyu = task.customer.debtUyu + newTaskPrice;
+          } else {
+            task.customer.debtUsd = task.customer.debtUsd + newTaskPrice;
+          }
+        }
+        await task.customer.save();
+      });
 
-  res.status(StatusCodes.OK).json({ check, newTask });
+    res.status(StatusCodes.OK).json({ check, newTask });
+  }
 });
 
 const deleteCheck = asyncWrapper(async (req, res) => {

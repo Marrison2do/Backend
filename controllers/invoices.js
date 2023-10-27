@@ -1,5 +1,6 @@
 const Invoice = require("../models/Invoices");
 const Company = require("../models/Companies");
+const Receipt = require("../models/Receipts");
 const asyncWrapper = require("../middleware/async");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
@@ -18,11 +19,18 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
     currency,
     invoiceType,
     numericFilters,
+    modal,
+    price,
+    createdAt,
+    legalDate,
   } = req.query;
+
   const queryObject = {};
+  const receiptQuery = {};
 
   if (currency) {
     queryObject.currency = currency;
+    receiptQuery.currency = currency;
   }
   if (description) {
     queryObject.description = { $regex: description, $options: "i" };
@@ -38,6 +46,7 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
       name: { $regex: company, $options: "i" },
     });
     queryObject.company = idCompany._id;
+    receiptQuery.company = idCompany._id;
   }
 
   if (createdBy) {
@@ -57,12 +66,18 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
       $gte: new Date(newerThan),
       $lte: new Date(olderThan),
     };
+    receiptQuery.legalDate = {
+      $gte: new Date(newerThan),
+      $lte: new Date(olderThan),
+    };
   }
   if (newerThan && !olderThan) {
     queryObject.legalDate = { $gte: new Date(newerThan) };
+    receiptQuery.legalDate = { $gte: new Date(newerThan) };
   }
   if (!newerThan && olderThan) {
     queryObject.legalDate = { $lte: new Date(olderThan) };
+    receiptQuery.legalDate = { $lte: new Date(olderThan) };
   }
   if (invoiceType) {
     queryObject.invoiceType = invoiceType;
@@ -90,30 +105,51 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
     });
   }
   const projection = {
-    description: 1,
-    price: 1,
-    company: 1,
-    legalDate: 1,
-    currency: 1,
-    invoiceType: 1,
-    serial: 1,
-    payed: 1,
-    createdAt: 1,
+    createdBy: 0,
+    updatedBy: 0,
   };
+  if (modal) {
+    let invoiceList = await Invoice.find(queryObject, projection).populate(
+      "company",
+      "name"
+    );
+    let receiptList = await Receipt.find(receiptQuery, projection).populate(
+      "company",
+      "name"
+    );
 
-  let result = Invoice.find(queryObject, projection).populate(
-    "company",
-    "name"
-  );
-  if (sort) {
-    const sortList = sort.split(",").join(" ");
-    result = result.sort(sortList);
-  } else {
-    result = result.sort("createdAt");
+    receiptList.map((item) => {
+      item.serial = item.number;
+      return item;
+    });
+    let list = [...invoiceList, ...receiptList];
+
+    list.sort((a, b) =>
+      a.serial > b.serial
+        ? 1
+        : a.legalDate === b.legalDate
+        ? a.createdAt < b.createdAt
+          ? 1
+          : -1
+        : -1
+    );
+    res.status(StatusCodes.OK).json({ list, nbHits: list.length });
   }
+  if (!modal) {
+    let result = Invoice.find(queryObject, projection).populate(
+      "company",
+      "name"
+    );
+    if (sort) {
+      const sortList = sort.split(",").join(" ");
+      result = result.sort(sortList);
+    } else {
+      result = result.sort("createdAt");
+    }
 
-  const list = await result;
-  res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+    const list = await result;
+    res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+  }
 });
 
 const getInvoice = asyncWrapper(async (req, res) => {
@@ -173,7 +209,6 @@ const createInvoice = asyncWrapper(async (req, res) => {
 const updateInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
   const oldInvoice = await Invoice.findOne({ _id: invoiceId });
-  console.log(oldInvoice.price);
   var invoicePrice = await oldInvoice.price;
   const invoiceCurrency = await oldInvoice.currency;
   const type = await oldInvoice.invoiceType;
@@ -208,7 +243,6 @@ const updateInvoice = asyncWrapper(async (req, res) => {
   });
   const newInvoice = await Invoice.findOne({ _id: invoiceId });
   let newInvoicePrice = await newInvoice.price;
-  console.log(newInvoicePrice);
   const newInvoiceCurrency = await newInvoice.currency;
   const newType = await newInvoice.invoiceType;
   Invoice.findOne({ _id: invoiceId })
@@ -222,10 +256,8 @@ const updateInvoice = asyncWrapper(async (req, res) => {
       if (newInvoicePrice) {
         if (newInvoiceCurrency == "UYU") {
           invoice.company.debtUyu = invoice.company.debtUyu + newInvoicePrice;
-          console.log("work UYU");
         } else {
           invoice.company.debtUsd = invoice.company.debtUsd + newInvoicePrice;
-          console.log("work USD");
         }
       }
       await invoice.company.save();

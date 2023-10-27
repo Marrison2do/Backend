@@ -7,6 +7,10 @@ const ReceiptSchema = new mongoose.Schema(
       ref: "Company",
       required: [true, "Ingrese Empresa"],
     },
+    description: {
+      type: String,
+      maxlength: 100,
+    },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: "User",
@@ -19,6 +23,11 @@ const ReceiptSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: [true, "Ingrese Precio"],
+    },
+    color: {
+      type: String,
+      enum: ["white", "blue", "green", "yellow", "purple"],
+      default: "white",
     },
     currency: {
       type: String,
@@ -35,6 +44,10 @@ const ReceiptSchema = new mongoose.Schema(
         ref: "Invoice",
       },
     ],
+    invoiceType: {
+      type: String,
+      default: "receipt",
+    },
     invoicesPrices: [
       {
         type: Number,

@@ -21,6 +21,11 @@ const CustomerSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "Ingrese Usuario"],
     },
+    color: {
+      type: String,
+      enum: ["white", "blue", "green", "yellow", "purple"],
+      default: "white",
+    },
     tasks: [
       {
         type: mongoose.Types.ObjectId,

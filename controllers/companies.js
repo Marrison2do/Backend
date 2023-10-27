@@ -2,6 +2,7 @@ const Company = require("../models/Companies");
 const Customer = require("../models/Customers");
 const Invoice = require("../models/Invoices");
 const User = require("../models/User");
+const Receipt = require("../models/Receipts");
 const asyncWrapper = require("../middleware/async");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
@@ -96,6 +97,7 @@ const getAllCompanies = asyncWrapper(async (req, res) => {
     updatedAt: 1,
     invoices: 1,
     receipts: 1,
+    color: 1,
   };
 
   let result = Company.find(queryObject, projection).populate(
@@ -181,6 +183,9 @@ const deleteCompany = asyncWrapper(async (req, res) => {
 
       for (let i = 0; i < company.invoices.length; i++) {
         await Invoice.findOneAndDelete({ _id: company.invoices[i] });
+      }
+      for (let i = 0; i < company.receipts.length; i++) {
+        await Receipt.findOneAndDelete({ _id: company.receipt[i] });
       }
 
       await Company.findOneAndDelete({ _id: companyId });

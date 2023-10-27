@@ -23,6 +23,11 @@ const CompanySchema = new mongoose.Schema(
       ref: "Customer",
       required: [true, "Ingrese Cliente"],
     },
+    color: {
+      type: String,
+      enum: ["white", "blue", "green", "yellow", "purple"],
+      default: "white",
+    },
     invoices: [
       {
         type: mongoose.Types.ObjectId,

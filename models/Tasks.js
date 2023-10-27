@@ -8,6 +8,10 @@ const TaskSchema = new mongoose.Schema(
       required: [true, "Ingrese descripción"],
       maxlength: 800,
     },
+    comment: {
+      type: String,
+      maxlength: 100,
+    },
     price: {
       type: Number,
     },
@@ -30,6 +34,12 @@ const TaskSchema = new mongoose.Schema(
       type: String,
       enum: ["UYU", "USD"],
       required: [true, "Ingrese Moneda"],
+    },
+
+    color: {
+      type: String,
+      enum: ["white", "blue", "green", "yellow", "purple"],
+      default: "white",
     },
     type: {
       type: String,

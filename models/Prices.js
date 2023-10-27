@@ -7,9 +7,16 @@ const PriceSchema = new mongoose.Schema(
       maxlength: 100,
       required: [true, "Ingrese nombre"],
     },
+    description: {
+      type: String,
+      maxlength: 100,
+    },
     price: {
       type: Number,
       required: [true, "Ingrese precio"],
+    },
+    cost: {
+      type: Number,
     },
     unit: {
       type: String,
@@ -19,6 +26,11 @@ const PriceSchema = new mongoose.Schema(
     supplier: {
       type: String,
       maxlength: 30,
+    },
+    color: {
+      type: String,
+      enum: ["white", "blue", "green", "yellow", "purple"],
+      default: "white",
     },
     createdBy: {
       type: mongoose.Types.ObjectId,

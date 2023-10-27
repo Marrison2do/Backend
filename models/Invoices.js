@@ -34,6 +34,11 @@ const InvoiceSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Ingrese Fecha de Emisión"],
     },
+    color: {
+      type: String,
+      enum: ["white", "blue", "green", "yellow", "purple"],
+      default: "white",
+    },
     serial: {
       type: Number,
       required: [true, "Ingrese Número de Factura"],

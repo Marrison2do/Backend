@@ -24,6 +24,11 @@ const CheckSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "User",
     },
+    color: {
+      type: String,
+      enum: ["white", "blue", "green", "yellow", "purple"],
+      default: "white",
+    },
     currency: {
       type: String,
       enum: ["UYU", "USD"],

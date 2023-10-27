@@ -17,6 +17,8 @@ const getAllPrices = asyncWrapper(async (req, res) => {
     sort,
     pack,
     currency,
+    noPrice,
+    noCost,
   } = req.query;
 
   const queryObject = {};
@@ -40,6 +42,12 @@ const getAllPrices = asyncWrapper(async (req, res) => {
       name: { $regex: createdBy, $options: "i" },
     });
     queryObject.createdBy = idUser;
+  }
+  if (noPrice) {
+    queryObject.price = undefined;
+  }
+  if (noCost) {
+    queryObject.cost = undefined;
   }
   if (newerThan && olderThan) {
     queryObject.createdAt = {
@@ -78,7 +86,7 @@ const getAllPrices = asyncWrapper(async (req, res) => {
       regEx,
       (match) => `-${operatorMap[match]}-`
     );
-    const options = ["price"];
+    const options = ["price", "cost"];
     filters = filters.split(",").forEach((item) => {
       const [field, operator, value] = item.split("-");
       if (options.includes(field)) {
@@ -86,6 +94,7 @@ const getAllPrices = asyncWrapper(async (req, res) => {
       }
     });
   }
+
   let result = Price.find(queryObject);
   if (sort) {
     const sortList = sort.split(",").join(" ");
@@ -115,15 +124,7 @@ const getPrice = asyncWrapper(async (req, res) => {
 });
 const createPrice = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
-  const price = await Price.create({
-    name: req.body.name,
-    price: req.body.price,
-    unit: req.body.unit,
-    supplier: req.body.supplier,
-    createdBy: req.body.createdBy,
-    currency: req.body.currency,
-    pack: req.body.pack,
-  });
+  const price = await Price.create(req.body);
 
   res.status(StatusCodes.CREATED).json({ price });
 });

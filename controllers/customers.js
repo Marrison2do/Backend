@@ -1,6 +1,7 @@
 const Customer = require("../models/Customers");
 const Task = require("../models/Tasks");
 const User = require("../models/User");
+const Check = require("../models/Checks");
 const asyncWrapper = require("../middleware/async");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
@@ -41,7 +42,6 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     const idCompany = await Company.findOne({
       name: { $regex: company, $options: "i" },
     });
-    console.log(idCompany.name);
     queryObject.company = idCompany._id;
   }
   if (createdBy) {
@@ -109,6 +109,7 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     phoneNumber: 1,
     description: 1,
     archive: 1,
+    color: 1,
   };
 
   let result = Customer.find(queryObject, projection);
@@ -204,6 +205,9 @@ const deleteCustomer = asyncWrapper(async (req, res) => {
 
       for (let i = 0; i < customer.tasks.length; i++) {
         await Task.findOneAndDelete({ _id: customer.tasks[i] });
+      }
+      for (let i = 0; i < customer.checks.length; i++) {
+        await Check.findOneAndDelete({ _id: customer.checks[i] });
       }
 
       await Customer.findOneAndDelete({ _id: customerId });
