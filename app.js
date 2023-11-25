@@ -18,6 +18,7 @@ const receiptsRouter = require("./routes/receipts");
 const tasksRouter = require("./routes/tasks");
 const pricesRouter = require("./routes/prices");
 const exchangeRouter = require("./routes/exchange");
+const globalRouter = require("./routes/globals");
 
 // error handler
 const notFoundMiddleware = require("./middleware/not-found");
@@ -37,6 +38,7 @@ app.use("/api/v1/receipts", authenticateUser, receiptsRouter);
 app.use("/api/v1/tasks", authenticateUser, tasksRouter);
 app.use("/api/v1/prices", authenticateUser, pricesRouter);
 app.use("/api/v1/exchange", authenticateUser, exchangeRouter);
+app.use("/api/v1/globals", authenticateUser, globalRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
