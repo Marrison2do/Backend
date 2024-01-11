@@ -158,6 +158,46 @@ const createCompany = asyncWrapper(async (req, res) => {
   res.status(StatusCodes.CREATED).json({ company });
 });
 
+const createFilledCompany = asyncWrapper(async (req, res) => {
+  req.body.createdBy = req.user.userId;
+  const company = await Company.create(req.body);
+  const invoiceList = req.body.invoiceList;
+  const companyId = await company._id;
+  Company.findOne({ _id: companyId })
+    .populate("createdBy")
+    .exec(async function (err, company) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      company.createdBy.companies.push(companyId);
+      await company.createdBy.save();
+    });
+  Company.findOne({ _id: companyId })
+    .populate("customer")
+    .exec(async function (err, company) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      company.customer.company = companyId;
+      company.customer.adminRank = false;
+      await company.customer.save();
+    });
+  for (let i = 0; i < invoiceList.length; i++) {
+    await Invoice.create({
+      createdBy: req.body.createdBy,
+      company: companyId,
+      description: invoiceList[i].description,
+      currency: invoiceList[i].currency,
+      price: invoiceList[i].price,
+      invoiceType: invoiceList[i].invoiceType,
+      color: invoiceList[i].color,
+      pack: invoiceList[i].pack,
+      legalDate: invoiceList[i].legalDate,
+      serial: invoiceList[i].serial,
+      payed: invoiceList[i].payed,
+    });
+  }
+  res.status(StatusCodes.CREATED).json({ company });
+});
+
 const updateCompany = asyncWrapper(async (req, res) => {
   const { id: companyId } = req.params;
   req.body.updatedBy = req.user.userId;
@@ -197,6 +237,7 @@ module.exports = {
   getAllCompanies,
   getCompany,
   createCompany,
+  createFilledCompany,
   updateCompany,
   deleteCompany,
 };

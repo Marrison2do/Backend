@@ -173,6 +173,48 @@ const createCustomer = asyncWrapper(async (req, res) => {
   res.status(StatusCodes.CREATED).json({ customer });
 });
 
+const createFilledCustomer = asyncWrapper(async (req, res) => {
+  req.body.createdBy = req.user.userId;
+  const rank = req.user.rank;
+  if (rank == "admin") req.body.adminRank = true;
+  const customer = await Customer.create({
+    name: req.body.name,
+    phoneNumber: req.body.phoneNumber,
+    description: req.body.description,
+    adminRank: req.body.adminRank,
+    archive: req.body.archive,
+    createdBy: req.body.createdBy,
+    debtUyu: req.body.debtUyu,
+    debtUsd: req.body.debtUsd,
+  });
+  const taskList = req.body.taskList;
+  const customerId = await customer._id;
+  Customer.findOne({ _id: customerId })
+    .populate("createdBy")
+    .exec(async function (err, customer) {
+      if (err)
+        return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+      customer.createdBy.customers.push(customerId);
+      await customer.createdBy.save();
+    });
+  for (let i = 0; i < taskList.length; i++) {
+    await Task.create({
+      createdBy: req.body.createdBy,
+      customer: customerId,
+      description: taskList[i].description,
+      currency: taskList[i].currency,
+      price: taskList[i].price,
+      type: taskList[i].type,
+      color: taskList[i].color,
+      pack: taskList[i].pack,
+      createdAt: taskList[i].createdAt,
+      updatedAt: taskList[i].updatedAt,
+    });
+  }
+
+  res.status(StatusCodes.CREATED).json({ customer });
+});
+
 const updateCustomer = asyncWrapper(async (req, res) => {
   const { id: customerId } = req.params;
   req.body.updatedBy = req.user.userId;
@@ -219,6 +261,7 @@ module.exports = {
   getAllCustomers,
   getCustomer,
   createCustomer,
+  createFilledCustomer,
   updateCustomer,
   deleteCustomer,
 };
