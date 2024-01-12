@@ -162,6 +162,7 @@ const createFilledCompany = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
   const company = await Company.create(req.body);
   const invoiceList = req.body.invoiceList;
+  const receiptList = req.body.receiptList;
   const companyId = await company._id;
   Company.findOne({ _id: companyId })
     .populate("createdBy")
@@ -193,6 +194,21 @@ const createFilledCompany = asyncWrapper(async (req, res) => {
       legalDate: invoiceList[i].legalDate,
       serial: invoiceList[i].serial,
       payed: invoiceList[i].payed,
+    });
+  }
+  for (let i = 0; i < receiptList.length; i++) {
+    await Receipt.create({
+      createdBy: req.body.createdBy,
+      company: companyId,
+      description: receiptList[i].description,
+      currency: receiptList[i].currency,
+      price: receiptList[i].price,
+      invoiceType: receiptList[i].invoiceType,
+      color: receiptList[i].color,
+      pack: receiptList[i].pack,
+      legalDate: receiptList[i].legalDate,
+      number: receiptList[i].number,
+      payed: receiptList[i].payed,
     });
   }
   res.status(StatusCodes.CREATED).json({ company });
