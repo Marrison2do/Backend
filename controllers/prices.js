@@ -128,6 +128,16 @@ const createPrice = asyncWrapper(async (req, res) => {
 
   res.status(StatusCodes.CREATED).json({ price });
 });
+const createManyPrices = asyncWrapper(async (req, res) => {
+  req.body.createdBy = req.user.userId;
+  const priceList = req.body.priceList;
+  for (let i = 0; i < priceList.length; i++) {
+    await Price.create(priceList[i]);
+  }
+
+  res.status(StatusCodes.CREATED).json({ priceList });
+});
+
 const updatePrice = asyncWrapper(async (req, res) => {
   const { id: priceId } = req.params;
   req.body.updatedBy = req.user.userId;
@@ -166,6 +176,7 @@ module.exports = {
   getAllPrices,
   getPrice,
   createPrice,
+  createManyPrices,
   updatePrice,
   deletePrice,
 };

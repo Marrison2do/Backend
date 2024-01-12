@@ -198,7 +198,7 @@ const createFilledCustomer = asyncWrapper(async (req, res) => {
       await customer.createdBy.save();
     });
   for (let i = 0; i < taskList.length; i++) {
-    await Task.create({
+    const task = await Task.create({
       createdBy: req.body.createdBy,
       customer: customerId,
       description: taskList[i].description,
@@ -210,6 +210,15 @@ const createFilledCustomer = asyncWrapper(async (req, res) => {
       createdAt: taskList[i].createdAt,
       updatedAt: taskList[i].updatedAt,
     });
+    const taskId = await task._id;
+    Task.findOne({ _id: taskId })
+      .populate("customer")
+      .exec(async function (err, task) {
+        if (err) return new NotFoundError(err);
+        task.customer.tasks.push(taskId);
+
+        await task.customer.save();
+      });
   }
 
   res.status(StatusCodes.CREATED).json({ customer });

@@ -182,7 +182,7 @@ const createFilledCompany = asyncWrapper(async (req, res) => {
       await company.customer.save();
     });
   for (let i = 0; i < invoiceList.length; i++) {
-    await Invoice.create({
+    const invoice = await Invoice.create({
       createdBy: req.body.createdBy,
       company: companyId,
       description: invoiceList[i].description,
@@ -195,9 +195,19 @@ const createFilledCompany = asyncWrapper(async (req, res) => {
       serial: invoiceList[i].serial,
       payed: invoiceList[i].payed,
     });
+    const invoiceId = await invoice._id;
+    Invoice.findOne({ _id: invoiceId })
+      .populate("company")
+      .exec(async function (err, invoice) {
+        if (err)
+          return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+        invoice.company.invoices.push(invoiceId);
+
+        await invoice.company.save();
+      });
   }
   for (let i = 0; i < receiptList.length; i++) {
-    await Receipt.create({
+    const receipt = await Receipt.create({
       createdBy: req.body.createdBy,
       company: companyId,
       description: receiptList[i].description,
@@ -210,6 +220,16 @@ const createFilledCompany = asyncWrapper(async (req, res) => {
       number: receiptList[i].number,
       payed: receiptList[i].payed,
     });
+    const receiptId = await receipt._id;
+    Receipt.findOne({ _id: receiptId })
+      .populate("company")
+      .exec(async function (err, receipt) {
+        if (err)
+          return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
+        receipt.company.receipts.push(receiptId);
+
+        await receipt.company.save();
+      });
   }
   res.status(StatusCodes.CREATED).json({ company });
 });
@@ -241,7 +261,7 @@ const deleteCompany = asyncWrapper(async (req, res) => {
         await Invoice.findOneAndDelete({ _id: company.invoices[i] });
       }
       for (let i = 0; i < company.receipts.length; i++) {
-        await Receipt.findOneAndDelete({ _id: company.receipt[i] });
+        await Receipt.findOneAndDelete({ _id: company.receipts[i] });
       }
 
       await Company.findOneAndDelete({ _id: companyId });
