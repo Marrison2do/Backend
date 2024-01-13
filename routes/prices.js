@@ -5,14 +5,14 @@ const {
   getAllPrices,
   getPrice,
   createPrice,
-  createManyPrices,
+  createBulkPrices,
   updatePrice,
   deletePrice,
 } = require("../controllers/prices");
 
 router.route("/").post(createPrice).get(getAllPrices);
 
-router.route("/many/").post(createManyPrices);
+router.route("/bulk/").post(createBulkPrices);
 
 router.route("/:id").get(getPrice).patch(updatePrice).delete(deletePrice);
 

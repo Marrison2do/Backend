@@ -128,11 +128,20 @@ const createPrice = asyncWrapper(async (req, res) => {
 
   res.status(StatusCodes.CREATED).json({ price });
 });
-const createManyPrices = asyncWrapper(async (req, res) => {
+const createBulkPrices = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
   const priceList = req.body.priceList;
   for (let i = 0; i < priceList.length; i++) {
-    await Price.create(priceList[i]);
+    await Price.create({
+      createdBy: req.user.userId,
+      name: priceList[i].name,
+      unit: priceList[i].unit,
+      supplier: priceList[i].supplier,
+      pack: priceList[i].pack,
+      price: priceList[i].price,
+      cost: priceList[i].cost,
+      currency: priceList[i].currency,
+    });
   }
 
   res.status(StatusCodes.CREATED).json({ priceList });
@@ -176,7 +185,7 @@ module.exports = {
   getAllPrices,
   getPrice,
   createPrice,
-  createManyPrices,
+  createBulkPrices,
   updatePrice,
   deletePrice,
 };
