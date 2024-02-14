@@ -25,7 +25,6 @@ const getAllSeals = asyncWrapper(async (req, res) => {
     queryObject.type = { $regex: type, $options: "i" };
   }
 
-  
   if (createdBy) {
     const idUser = await User.find({
       name: { $regex: createdBy, $options: "i" },
@@ -81,12 +80,12 @@ const getAllSeals = asyncWrapper(async (req, res) => {
     });
   }
 
-  let result = Price.find(queryObject);
+  let result = Seal.find(queryObject);
   if (sort) {
     const sortList = sort.split(",").join(" ");
     result = result.sort(sortList);
   } else {
-    result = result.sort("pack");
+    result = result.sort("code");
   }
 
   const list = await result;
@@ -94,7 +93,7 @@ const getAllSeals = asyncWrapper(async (req, res) => {
 });
 const getSeal = asyncWrapper(async (req, res) => {
   const { id: priceId } = req.params;
-  await Price.findOne({ _id: priceId })
+  await Seal.findOne({ _id: priceId })
     .populate("createdBy", "name")
     .populate("updatedBy", "name")
     .exec(async function (err, price) {
@@ -110,49 +109,46 @@ const getSeal = asyncWrapper(async (req, res) => {
 });
 const createSeal = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
-  const price = await Price.create(req.body);
+  const seal = await Seal.create(req.body);
 
-  res.status(StatusCodes.CREATED).json({ price });
+  res.status(StatusCodes.CREATED).json({ seal });
 });
 const createBulkSeals = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
-  const priceList = req.body.priceList;
-  for (let i = 0; i < priceList.length; i++) {
-    await Price.create({
+  const sealList = req.body.sealList;
+  for (let i = 0; i < sealList.length; i++) {
+    await Seal.create({
       createdBy: req.user.userId,
-      name: priceList[i].name,
-      unit: priceList[i].unit,
-      supplier: priceList[i].supplier,
-      pack: priceList[i].pack,
-      price: priceList[i].price,
-      cost: priceList[i].cost,
-      currency: priceList[i].currency,
+      code: sealList[i].code,
+      size: sealList[i].size,
+      type: sealList[i].type,
+      price: sealList[i].price,
     });
   }
 
-  res.status(StatusCodes.CREATED).json({ priceList });
+  res.status(StatusCodes.CREATED).json({ sealList });
 });
 
 const updateSeal = asyncWrapper(async (req, res) => {
-  const { id: priceId } = req.params;
+  const { id: sealId } = req.params;
   req.body.updatedBy = req.user.userId;
-  await Price.findOneAndUpdate({ _id: priceId }, req.body, {
+  await Seal.findOneAndUpdate({ _id: sealId }, req.body, {
     new: true,
     runValidators: true,
   });
-  const price = await Price.findOne({ _id: priceId });
-  if (!price) {
+  const seal = await Seal.findOne({ _id: sealId });
+  if (!seal) {
     return res
       .status(StatusCodes.NOT_FOUND)
-      .json({ msg: `No Hay Articulo con el ID : ${priceId}` });
+      .json({ msg: `No Hay Articulo con el ID : ${sealId}` });
   }
 
   res.status(StatusCodes.OK).json(price);
 });
 
 const deleteSeal = asyncWrapper(async (req, res) => {
-  const { id: priceId } = req.params;
-  await Price.findOneAndDelete({ _id: priceId }).exec(async function (
+  const { id: sealId } = req.params;
+  await Seal.findOneAndDelete({ _id: sealId }).exec(async function (
     err,
     price
   ) {
@@ -161,7 +157,7 @@ const deleteSeal = asyncWrapper(async (req, res) => {
     if (!price) {
       return res
         .status(StatusCodes.NOT_FOUND)
-        .json({ msg: `No Hay Articulo con el ID : ${priceId}` });
+        .json({ msg: `No Hay Articulo con el ID : ${sealId}` });
     }
     res.status(StatusCodes.OK).json(price);
   });
