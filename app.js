@@ -17,6 +17,7 @@ const invoicesRouter = require("./routes/invoices");
 const receiptsRouter = require("./routes/receipts");
 const tasksRouter = require("./routes/tasks");
 const pricesRouter = require("./routes/prices");
+const sealsRouter = require("./routes/seals");
 const exchangeRouter = require("./routes/exchange");
 const globalRouter = require("./routes/globals");
 
@@ -37,6 +38,7 @@ app.use("/api/v1/invoices", authenticateUser, invoicesRouter);
 app.use("/api/v1/receipts", authenticateUser, receiptsRouter);
 app.use("/api/v1/tasks", authenticateUser, tasksRouter);
 app.use("/api/v1/prices", authenticateUser, pricesRouter);
+app.use("/api/v1/seals", authenticateUser, sealsRouter);
 app.use("/api/v1/exchange", authenticateUser, exchangeRouter);
 app.use("/api/v1/globals", authenticateUser, globalRouter);
 

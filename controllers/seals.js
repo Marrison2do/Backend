@@ -6,6 +6,7 @@ const { StatusCodes } = require("http-status-codes");
 const getAllSeals = asyncWrapper(async (req, res) => {
   const {
     size,
+    code,
     createdBy,
     newerThan,
     olderThan,
@@ -13,7 +14,7 @@ const getAllSeals = asyncWrapper(async (req, res) => {
     olderUpdateThan,
     numericFilters,
     sort,
-    type,
+    pack,
     noPrice,
   } = req.query;
 
@@ -21,8 +22,11 @@ const getAllSeals = asyncWrapper(async (req, res) => {
   if (size) {
     queryObject.size = { $regex: size, $options: "i" };
   }
-  if (type) {
-    queryObject.type = { $regex: type, $options: "i" };
+  if (code) {
+    queryObject.code = code;
+  }
+  if (pack) {
+    queryObject.pack = { $regex: pack, $options: "i" };
   }
 
   if (createdBy) {
@@ -92,19 +96,19 @@ const getAllSeals = asyncWrapper(async (req, res) => {
   res.status(StatusCodes.OK).json({ list, nbHits: list.length });
 });
 const getSeal = asyncWrapper(async (req, res) => {
-  const { id: priceId } = req.params;
-  await Seal.findOne({ _id: priceId })
+  const { id: sealId } = req.params;
+  await Seal.findOne({ _id: sealId })
     .populate("createdBy", "name")
     .populate("updatedBy", "name")
-    .exec(async function (err, price) {
+    .exec(async function (err, seal) {
       if (err)
         return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-      if (!price) {
+      if (!seal) {
         return res
           .status(StatusCodes.NOT_FOUND)
-          .json({ msg: `No Hay Cliente con el ID : ${priceId}` });
+          .json({ msg: `No Hay Cliente con el ID : ${sealId}` });
       }
-      res.status(StatusCodes.OK).json(price);
+      res.status(StatusCodes.OK).json(seal);
     });
 });
 const createSeal = asyncWrapper(async (req, res) => {
@@ -121,7 +125,7 @@ const createBulkSeals = asyncWrapper(async (req, res) => {
       createdBy: req.user.userId,
       code: sealList[i].code,
       size: sealList[i].size,
-      type: sealList[i].type,
+      pack: sealList[i].pack,
       price: sealList[i].price,
     });
   }
@@ -143,23 +147,20 @@ const updateSeal = asyncWrapper(async (req, res) => {
       .json({ msg: `No Hay Articulo con el ID : ${sealId}` });
   }
 
-  res.status(StatusCodes.OK).json(price);
+  res.status(StatusCodes.OK).json(seal);
 });
 
 const deleteSeal = asyncWrapper(async (req, res) => {
   const { id: sealId } = req.params;
-  await Seal.findOneAndDelete({ _id: sealId }).exec(async function (
-    err,
-    price
-  ) {
+  await Seal.findOneAndDelete({ _id: sealId }).exec(async function (err, seal) {
     if (err)
       return res.status(StatusCodes.NOT_FOUND).json({ msg: `ID Inválida` });
-    if (!price) {
+    if (!seal) {
       return res
         .status(StatusCodes.NOT_FOUND)
         .json({ msg: `No Hay Articulo con el ID : ${sealId}` });
     }
-    res.status(StatusCodes.OK).json(price);
+    res.status(StatusCodes.OK).json(seal);
   });
 });
 

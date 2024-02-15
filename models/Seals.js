@@ -12,7 +12,7 @@ const SealSchema = new mongoose.Schema(
       required: [true, "Ingrese Codigo"],
       unique: [true, "Código Existente"],
     },
-    type: { type: String, maxlength: 20 },
+    pack: { type: String, maxlength: 20 },
     price: { type: Number, required: [true, "Ingrese Precio"] },
   },
   { timestamps: true }
