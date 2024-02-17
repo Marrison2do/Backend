@@ -19,7 +19,12 @@ const getAllPrices = asyncWrapper(async (req, res) => {
     currency,
     noPrice,
     noCost,
+    page,
+    pageSize,
   } = req.query;
+
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
 
   const queryObject = {};
   if (name) {
@@ -104,7 +109,13 @@ const getAllPrices = asyncWrapper(async (req, res) => {
   }
 
   const list = await result;
-  res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+
+  const paginatedList = list.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(list.length / pageSize);
+
+  res
+    .status(StatusCodes.OK)
+    .json({ list: paginatedList, totalPages, nbHits: list.length });
 });
 const getPrice = asyncWrapper(async (req, res) => {
   const { id: priceId } = req.params;
