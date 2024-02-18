@@ -23,8 +23,11 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
     price,
     createdAt,
     legalDate,
+    page,
+    pageSize,
   } = req.query;
-
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
   const queryObject = {};
   const receiptQuery = {};
 
@@ -133,7 +136,13 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
           : -1
         : -1
     );
-    res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+
+    const totalPages = Math.ceil(list.length / pageSize);
+    const paginatedList = list.slice(startIndex, endIndex);
+
+    res
+      .status(StatusCodes.OK)
+      .json({ list: paginatedList, totalPages, nbHits: list.length });
   }
   if (!modal) {
     let result = Invoice.find(queryObject, projection).populate(
@@ -148,7 +157,12 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
     }
 
     const list = await result;
-    res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+    const totalPages = Math.ceil(list.length / pageSize);
+    const paginatedList = list.slice(startIndex, endIndex);
+
+    res
+      .status(StatusCodes.OK)
+      .json({ list: paginatedList, totalPages, nbHits: list.length });
   }
 });
 

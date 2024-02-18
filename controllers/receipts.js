@@ -15,7 +15,11 @@ const getAllReceipts = asyncWrapper(async (req, res) => {
     currency,
     set,
     numericFilters,
+    page,
+    pageSize,
   } = req.query;
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
   const queryObject = {};
 
   if (currency) {
@@ -102,7 +106,12 @@ const getAllReceipts = asyncWrapper(async (req, res) => {
   }
 
   const list = await result;
-  res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+  const totalPages = Math.ceil(list.length / pageSize);
+  const paginatedList = list.slice(startIndex, endIndex);
+
+  res
+    .status(StatusCodes.OK)
+    .json({ list: paginatedList, totalPages, nbHits: list.length });
 });
 
 const getReceipt = asyncWrapper(async (req, res) => {

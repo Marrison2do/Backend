@@ -21,10 +21,13 @@ const getAllTasks = asyncWrapper(async (req, res) => {
     currency,
     type,
     numericFilters,
+    page,
+    pageSize,
   } = req.query;
   const queryObject = {};
   const rank = req.user.rank;
-
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
   {
     const customerObject = {};
     if (rank !== "admin") {
@@ -134,7 +137,12 @@ const getAllTasks = asyncWrapper(async (req, res) => {
   }
 
   const list = await result;
-  res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+  const totalPages = Math.ceil(list.length / pageSize);
+  const paginatedList = list.slice(startIndex, endIndex);
+
+  res
+    .status(StatusCodes.OK)
+    .json({ list: paginatedList, totalPages, nbHits: list.length });
 });
 
 const getTask = asyncWrapper(async (req, res) => {

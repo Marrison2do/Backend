@@ -19,7 +19,12 @@ const getAllCompanies = asyncWrapper(async (req, res) => {
     newerUpdateThan,
     olderUpdateThan,
     numericFilters,
+    page,
+    pageSize,
   } = req.query;
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
+
   const queryObject = {};
   if (name) {
     queryObject.name = { $regex: name, $options: "i" };
@@ -112,7 +117,12 @@ const getAllCompanies = asyncWrapper(async (req, res) => {
   }
 
   const list = await result;
-  res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+  const totalPages = Math.ceil(list.length / pageSize);
+  const paginatedList = list.slice(startIndex, endIndex);
+
+  res
+    .status(StatusCodes.OK)
+    .json({ list: paginatedList, totalPages, nbHits: list.length });
 });
 
 const getCompany = asyncWrapper(async (req, res) => {

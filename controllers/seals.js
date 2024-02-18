@@ -16,8 +16,11 @@ const getAllSeals = asyncWrapper(async (req, res) => {
     sort,
     pack,
     noPrice,
+    page,
+    pageSize,
   } = req.query;
-
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = page * pageSize;
   const queryObject = {};
   if (size) {
     queryObject.size = { $regex: size, $options: "i" };
@@ -93,7 +96,12 @@ const getAllSeals = asyncWrapper(async (req, res) => {
   }
 
   const list = await result;
-  res.status(StatusCodes.OK).json({ list, nbHits: list.length });
+  const totalPages = Math.ceil(list.length / pageSize);
+  const paginatedList = list.slice(startIndex, endIndex);
+
+  res
+    .status(StatusCodes.OK)
+    .json({ list: paginatedList, totalPages, nbHits: list.length });
 });
 const getSeal = asyncWrapper(async (req, res) => {
   const { id: sealId } = req.params;
