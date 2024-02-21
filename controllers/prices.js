@@ -19,9 +19,9 @@ const getAllPrices = asyncWrapper(async (req, res) => {
     currency,
     noPrice,
     noCost,
-    page,
-    pageSize,
   } = req.query;
+  const page = req.query.page || 1;
+  const pageSize = req.query.pageSize || 50;
 
   const startIndex = (page - 1) * pageSize;
   const endIndex = page * pageSize;

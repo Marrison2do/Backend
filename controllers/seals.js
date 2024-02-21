@@ -16,9 +16,9 @@ const getAllSeals = asyncWrapper(async (req, res) => {
     sort,
     pack,
     noPrice,
-    page,
-    pageSize,
   } = req.query;
+  const page = req.query.page || 1;
+  const pageSize = req.query.pageSize || 50;
   const startIndex = (page - 1) * pageSize;
   const endIndex = page * pageSize;
   const queryObject = {};

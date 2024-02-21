@@ -20,9 +20,10 @@ const getAllCustomers = asyncWrapper(async (req, res) => {
     olderUpdateThan,
     numericFilters,
     phoneNumber,
-    page,
-    pageSize,
   } = req.query;
+
+  const page = req.query.page || 1;
+  const pageSize = req.query.pageSize || 50;
 
   const startIndex = (page - 1) * pageSize;
   const endIndex = page * pageSize;
