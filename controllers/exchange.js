@@ -14,7 +14,7 @@ const getExchangeRate = asyncWrapper(async (req, res) => {
   };
 
   const today = dateHandler(0);
-  const threeDaysAgo = dateHandler(259200000);
+  const monthAgo = dateHandler(2592000000);
   const bodySting = `<x:Envelope
         xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
         xmlns:cot="Cotiza">
@@ -25,7 +25,7 @@ const getExchangeRate = asyncWrapper(async (req, res) => {
               <cot:Moneda>
                 <cot:item>2224</cot:item>
               </cot:Moneda>
-              <cot:FechaDesde>${threeDaysAgo}</cot:FechaDesde>
+              <cot:FechaDesde>${monthAgo}</cot:FechaDesde>
               <cot:FechaHasta>${today}</cot:FechaHasta>
               <cot:Grupo>0</cot:Grupo>
             </cot:Entrada>
