@@ -54,17 +54,16 @@ const TaskSchema = new mongoose.Schema(
       type: String,
       default: "General",
     },
-    // createdAt: {
-    //   type: Date,
-    //   required: [true, "Ingrese Fecha de Emisión"],
-    //   default: new date(),
-    // },
-    // updatedAt: {
-    //   type: Date,
-    //   required: [true, "Ingrese Fecha de Emisión"],
-    // },
-  },
-  { timestamps: true }
+    createdAt: {
+      type: Date,
+      required: [true, "Ingrese Fecha de Emisión"],
+    },
+    updatedAt: {
+      type: Date,
+      required: [true, "Ingrese Fecha de Emisión"],
+    },
+  }
+  // { timestamps: true }
 );
 
 module.exports = mongoose.model("Task", TaskSchema);

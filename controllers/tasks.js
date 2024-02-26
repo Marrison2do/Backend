@@ -171,6 +171,8 @@ const getTask = asyncWrapper(async (req, res) => {
 
 const createTask = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
+  req.body.createdAt = req.body.createdAt || Date.now();
+  req.body.updatedAt = req.body.createdAt || Date.now();
   const task = await Task.create(req.body);
   const taskId = await task._id;
   let taskPrice = await task.price;
@@ -233,6 +235,7 @@ const updateTask = asyncWrapper(async (req, res) => {
     });
 
   req.body.updatedBy = req.user.userId;
+  req.body.updatedAt = Date.now();
   await Task.findOneAndUpdate({ _id: taskId }, req.body, {
     new: true,
     runValidators: true,
