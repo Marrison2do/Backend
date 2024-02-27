@@ -128,10 +128,10 @@ const getAllInvoices = asyncWrapper(async (req, res) => {
     let list = [...invoiceList, ...receiptList];
 
     list.sort((a, b) =>
-      a.serial > b.serial
+      a.legalDate > b.legalDate
         ? 1
         : a.legalDate === b.legalDate
-        ? a.createdAt < b.createdAt
+        ? a.number < b.number
           ? 1
           : -1
         : -1
