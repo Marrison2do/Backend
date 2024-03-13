@@ -14,7 +14,7 @@ const getExchangeRate = asyncWrapper(async (req, res) => {
   };
 
   const today = dateHandler(0);
-  const monthAgo = dateHandler(2592000000);
+  const monthAgo = dateHandler(25920000000);
   const bodySting = `<x:Envelope
         xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
         xmlns:cot="Cotiza">
