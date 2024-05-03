@@ -54,16 +54,11 @@ const TaskSchema = new mongoose.Schema(
       type: String,
       default: "General",
     },
-    createdAt: {
+    date: {
       type: Date,
-      required: [true, "Ingrese Fecha de Emisión"],
     },
-    updatedAt: {
-      type: Date,
-      required: [true, "Ingrese Fecha de Emisión"],
-    },
-  }
-  // { timestamps: true }
+  },
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Task", TaskSchema);

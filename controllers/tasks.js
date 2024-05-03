@@ -116,6 +116,7 @@ const getAllTasks = asyncWrapper(async (req, res) => {
     });
   }
   const projection = {
+    date: 1,
     description: 1,
     comment: 1,
     pack: 1,
@@ -171,8 +172,6 @@ const getTask = asyncWrapper(async (req, res) => {
 
 const createTask = asyncWrapper(async (req, res) => {
   req.body.createdBy = req.user.userId;
-  req.body.createdAt = req.body.createdAt || Date.now();
-  req.body.updatedAt = req.body.createdAt || Date.now();
   const task = await Task.create(req.body);
   const taskId = await task._id;
   let taskPrice = await task.price;

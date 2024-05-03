@@ -10,11 +10,14 @@ const getExchangeRate = asyncWrapper(async (req, res) => {
     let year = isoDate.getFullYear();
     let month = isoDate.getMonth();
     let day = isoDate.getDate();
+    if (day < 10) {
+      day = "0" + day;
+    }
     return year + "/" + (month + 1) + "/" + day;
   };
 
   const today = dateHandler(0);
-  const monthAgo = dateHandler(25920000000);
+  const monthAgo = dateHandler(2592000000);
   const bodySting = `<x:Envelope
         xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
         xmlns:cot="Cotiza">

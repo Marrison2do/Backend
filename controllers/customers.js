@@ -218,8 +218,7 @@ const createFilledCustomer = asyncWrapper(async (req, res) => {
       type: taskList[i].type,
       color: taskList[i].color,
       pack: taskList[i].pack,
-      createdAt: taskList[i].createdAt,
-      updatedAt: taskList[i].updatedAt,
+      date: taskList[i].date,
     });
     const taskId = await task._id;
     Task.findOne({ _id: taskId })
