@@ -19,16 +19,18 @@ const getAllCompanies = asyncWrapper(async (req, res) => {
     newerUpdateThan,
     olderUpdateThan,
     numericFilters,
-    page,
-    pageSize,
   } = req.query;
+
+  const page = req.query.page || 1;
+  const pageSize = req.query.pageSize || 50;
+
   const startIndex = (page - 1) * pageSize;
   const endIndex = page * pageSize;
 
   const queryObject = {};
-  if (name) {
-    queryObject.name = { $regex: name, $options: "i" };
-  }
+  // if (name) {
+  //   queryObject.name = { $regex: name, $options: "i" };
+  // }
   if (rut) {
     queryObject.rut = rut;
   }
