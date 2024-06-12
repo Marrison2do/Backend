@@ -8,6 +8,7 @@ const connectDB = require("./db/connect");
 const authenticateUser = require("./middleware/authentication");
 const cors = require("cors");
 
+const cronRequest = require("./controllers/cronRequest");
 //routers
 const authRouter = require("./routes/auth");
 const checksRouter = require("./routes/checks");

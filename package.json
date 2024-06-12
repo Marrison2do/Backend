@@ -23,6 +23,7 @@
         "jsdom": "^22.1.0",
         "jsonwebtoken": "^8.5.1",
         "mongoose": "^5.13.2",
+        "node-cron": "^3.0.3",
         "rate-limiter": "^0.2.0",
         "start": "^5.1.0",
         "swagger-ui-express": "^4.1.6",
