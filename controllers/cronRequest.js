@@ -1,3 +1,4 @@
+require("dotenv").config();
 const jsdom = require("jsdom");
 const axios = require("axios");
 const cron = require("node-cron");
@@ -8,8 +9,25 @@ const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
 
 var cookie = "";
+const url = process.env.SIC_URL;
+const credentials = process.env.SIC_CREDENTIALS;
+
 async function login() {
-  console.log("logueando");
+  try {
+    const response = await axios({
+      metod: "post",
+      baseURL: url,
+      path: "/Login/Login",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: credentials,
+    });
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+  console.log(`logueando ${credentials}`);
   cookie = "milanesa";
 }
 
@@ -26,6 +44,6 @@ function handleRequest() {
   if (!cookie) login();
 }
 
-cron.schedule("*/5 * * * * *", () => {
+cron.schedule("* * * * *", () => {
   handleRequest();
 });
