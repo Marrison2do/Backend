@@ -15,7 +15,7 @@ const credentials = process.env.SIC_CREDENTIALS;
 async function login() {
   try {
     const response = await axios({
-      metod: "post",
+      method: "post",
       baseURL: url,
       path: "/Login/Login",
       headers: {
