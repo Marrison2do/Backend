@@ -39,7 +39,6 @@ const getExchangeRate = asyncWrapper(async (req, res) => {
     try {
       const response = await axios({
         method: "post",
-        // baseURL: `${process.env.REACT_APP_API_BASE}/`,
         baseURL: `https://cotizaciones.bcu.gub.uy/wscotizaciones/servlet/awsbcucotizaciones`,
 
         data: bodySting,

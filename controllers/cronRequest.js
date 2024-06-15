@@ -15,25 +15,38 @@ const credentials = process.env.SIC_CREDENTIALS;
 async function login() {
   try {
     const response = await axios({
-      method: "post",
-      baseURL: url,
-      path: "/Login/Login",
+      baseURL: url + "/Login/Login",
+      method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
+        path: "/Login/Login",
       },
       data: credentials,
     });
-    console.log(response);
+    console.log(response.headers);
+    // console.log(response.headers["set-cookie"][0]);
+
+    // cookie = response.headers["set-cookie"][0];
   } catch (error) {
     console.log(error);
   }
-  console.log(`logueando ${credentials}`);
-  cookie = "milanesa";
+  console.log(cookie);
 }
 
 async function getData() {
-  console.log(`cookie :${cookie}`);
-  cookie = "";
+  try {
+    const response = await axios({
+      baseURL: url + "/CFEs_emitidos?todos=True",
+      method: "GET",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        path: "/Login/Login",
+
+        Cookie: cookie,
+      },
+    });
+    console.log(response.data);
+  } catch (error) {}
 }
 
 function handleRequest() {
@@ -44,6 +57,8 @@ function handleRequest() {
   if (!cookie) login();
 }
 
-cron.schedule("* * * * *", () => {
-  handleRequest();
-});
+// cron.schedule("*/10 * * * * *", () => {
+//   handleRequest();
+// });
+
+handleRequest();
